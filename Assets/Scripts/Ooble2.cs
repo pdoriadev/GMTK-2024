@@ -26,10 +26,10 @@ public class Ooble2 : MonoBehaviour
 
     private SpriteRenderer _sprite;
 
-    // void Dead()
-    // {
-    //     GetComponent<Animator>().SetBool("dead", true);
-    // }
+    void Dead()
+    {
+        GetComponent<Animator>().SetBool("dead", true);
+    }
     
     void Start()
     {
@@ -127,6 +127,7 @@ public class Ooble2 : MonoBehaviour
                 _isMovingRight = false;
             else
                 _isMovingRight = true;
+            Dead();
         }
     }
 

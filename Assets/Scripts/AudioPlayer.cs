@@ -11,8 +11,6 @@ public class AudioPlayer : MonoBehaviour
     
     void Awake()
     {
-        if (Instance == null)
-            Instance = this;
         _audio = GetComponent<AudioSource>();
     }
 
