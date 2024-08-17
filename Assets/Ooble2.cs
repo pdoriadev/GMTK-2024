@@ -12,6 +12,9 @@ public class Ooble2 : MonoBehaviour
     public float minSpeed = 2;
     public float maxSpeed = 6;
     private float speed = 3;
+
+    public float minSize = 0.8f;
+    public float maxSize = 1.2f;
     
     private bool _isMovingRight = true;
     private Rigidbody2D _rb;
@@ -20,9 +23,15 @@ public class Ooble2 : MonoBehaviour
     public Ooble2 _climbOoble = null;
     
     private static List<Ooble2> _oobles = new List<Ooble2>();
+
+    private SpriteRenderer _sprite;
     
     void Start()
     {
+        var size = UnityEngine.Random.Range(minSize, maxSize);
+        transform.localScale = new Vector3(size, size, size);
+        
+        _sprite = GetComponent<SpriteRenderer>();
         _isMovingRight = UnityEngine.Random.value > 0.5f;
         speed = UnityEngine.Random.Range(minSpeed, maxSpeed);
         _rb = GetComponent<Rigidbody2D>();
@@ -72,10 +81,16 @@ public class Ooble2 : MonoBehaviour
         {
             _rb.mass = 1;
             if (_isMovingRight)
+            {
                 _rb.velocity = new Vector2(speed, _rb.velocity.y);
+                _sprite.flipX = false;
+            }
             else
+            {
                 _rb.velocity = new Vector2(-speed, _rb.velocity.y);
-            
+                _sprite.flipX = true;
+            }
+
             if (_rb.velocity.y > maxAirbornForce)
                 _rb.velocity = new Vector2(_rb.velocity.x, maxAirbornForce);
         }
