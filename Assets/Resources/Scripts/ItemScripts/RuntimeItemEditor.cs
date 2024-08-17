@@ -1,18 +1,29 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
+public enum Items
+{ 
+    Invalid = -1,
+    Platform,
+    NumberOfItems
+
+}
+
+
 public class RuntimeItemEditor : MonoBehaviour
 {
-    [SerializeField] private Tilemap EditableSpaceTilemap = null;
+    [SerializeField] private Tilemap m_EditableSpaceTilemap = null;
     
     private I_ItemCreator m_SelectedItemForPlacement = null;
+    //private Items m_SelectedItem = Items.Invalid;
     private Dictionary<Vector3Int, I_ItemDestroyer> m_PlacedItems = new Dictionary<Vector3Int, I_ItemDestroyer>();
     private Grid m_Grid;
     
     void Start()
     {
-        Debug.Assert(EditableSpaceTilemap != null, "Missing reference to editable space tilemap.");
+        Debug.Assert(m_EditableSpaceTilemap != null, "Missing reference to editable space tilemap.");
         m_Grid = gameObject.GetComponent<Grid>();
         Debug.Assert(m_Grid != null, "Missing reference.");
     }
@@ -26,7 +37,7 @@ public class RuntimeItemEditor : MonoBehaviour
             mouseGridPos = m_Grid.WorldToCell(mouseWorldPos);
         }
 
-        if (!EditableSpaceTilemap.HasTile(mouseGridPos))
+        if (!m_EditableSpaceTilemap.HasTile(mouseGridPos))
         {
             return;
         }
@@ -34,26 +45,42 @@ public class RuntimeItemEditor : MonoBehaviour
         // Attempt to Add Item
         if (Input.GetMouseButtonDown(0) || Input.GetMouseButton(0))
         {
-            m_SelectedItemForPlacement.CreateItem(mouseGridPos, EditableSpaceTilemap);
+            I_ItemDestroyer destroyer = null;
+            destroyer = m_SelectedItemForPlacement.CreateItem(mouseGridPos);
+            Debug.Assert(destroyer != null, "Destroyer is null");
+
+            m_PlacedItems.Add(mouseGridPos, destroyer);
+
             return;
         }
 
         // Remove Item
         if (Input.GetMouseButtonDown(1))
         {
-            I_ItemDestroyer item = m_PlacedItems[mouseGridPos];
-            if (item == null)
+            I_ItemDestroyer destroyer = m_PlacedItems[mouseGridPos];
+            if (destroyer == null)
             {
                 return;
             }
 
             m_PlacedItems.Remove(mouseGridPos);
-            item.DestroyItem();
+            destroyer.DestroyItem();
         }
     }
 
-    public void OnSelectItemForPlacement(I_ItemCreator item)
+    public void OnSelectItemForPlacement(Items item)
     {
-        m_SelectedItemForPlacement = item;
+        switch (item)
+        {
+            case Items.Invalid:
+                return;
+            case Items.NumberOfItems:
+                Debug.Assert(false, "This should never fire.");
+                return;
+            case Items.Platform:
+                m_SelectedItemForPlacement = new PlatformCreator();
+                break;
+        }
     }
 }
+
