@@ -32,7 +32,7 @@ public class Ooble2 : MonoBehaviour
         transform.localScale = new Vector3(size, size, size);
         
         _sprite = GetComponent<SpriteRenderer>();
-        _isMovingRight = UnityEngine.Random.value > 0.5f;
+        //_isMovingRight = UnityEngine.Random.value > 0.5f;
         speed = UnityEngine.Random.Range(minSpeed, maxSpeed);
         _rb = GetComponent<Rigidbody2D>();
         _oobles.Add(this);
