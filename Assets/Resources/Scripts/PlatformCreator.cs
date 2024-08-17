@@ -3,7 +3,7 @@ using UnityEngine.Tilemaps;
 
 public class PlatformCreator : I_ItemCreator
 {
-    private string m_ResourcePath = "Prefabs/Platform.prefab";
+    private string m_ResourcePath = "Prefabs/Platform";
     
     public I_ItemDestroyer CreateItem(Vector3Int gridPos, Tilemap tilemap)
     {
