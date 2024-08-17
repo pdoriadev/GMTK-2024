@@ -8,6 +8,7 @@ public class PlatformCreator : I_ItemCreator
     public I_ItemDestroyer CreateItem(Vector3Int gridPos, Tilemap tilemap)
     {
         GameObject prefab = Resources.Load<GameObject>(m_ResourcePath);
-        return Object.Instantiate(prefab, gridPos, Quaternion.identity).GetComponent<I_ItemDestroyer>();
+        I_ItemDestroyer destroyer = Object.Instantiate(prefab, gridPos, Quaternion.identity).GetComponent<I_ItemDestroyer>();
+        return destroyer;
     }
 }

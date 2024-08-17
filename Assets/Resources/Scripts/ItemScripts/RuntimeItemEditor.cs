@@ -43,8 +43,14 @@ public class RuntimeItemEditor : MonoBehaviour
         }
 
         // Attempt to Add Item
-        if (Input.GetMouseButtonDown(0) || Input.GetMouseButton(0))
+        if (Input.GetMouseButtonDown(0))
         {
+            if (m_PlacedItems.ContainsKey(mouseGridPos))
+            {
+                Debug.Log("An item is already placed here.");
+                return;
+            }
+
             I_ItemDestroyer destroyer = null;
             destroyer = m_SelectedItemForPlacement.CreateItem(mouseGridPos);
             Debug.Assert(destroyer != null, "Destroyer is null");
@@ -83,4 +89,3 @@ public class RuntimeItemEditor : MonoBehaviour
         }
     }
 }
-
