@@ -25,6 +25,11 @@ public class Ooble2 : MonoBehaviour
     private static List<Ooble2> _oobles = new List<Ooble2>();
 
     private SpriteRenderer _sprite;
+
+    // void Dead()
+    // {
+    //     GetComponent<Animator>().SetBool("dead", true);
+    // }
     
     void Start()
     {
