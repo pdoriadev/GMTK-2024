@@ -77,12 +77,12 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: f21c3678bbe72db449d17ff2ccf6621d, type: 3}
+  m_Sprite: {fileID: 21300000, guid: d66072bfcde3cea4e80099c0663e19cf, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 10.55, y: 10.55}
+  m_Size: {x: 1.7583333, y: 1.7583333}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -122,7 +122,7 @@ CircleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: -0.04, y: 0}
   serializedVersion: 2
   m_Radius: 0.5
 --- !u!95 &8111702568351002860
@@ -135,7 +135,7 @@ Animator:
   m_GameObject: {fileID: 7189485102730087410}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 9e95bc54c01b6874286f414f02b0e11c, type: 2}
+  m_Controller: {fileID: 9100000, guid: 434537d310fdde743a045647a14b794f, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -155,7 +155,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 7189485102730087410}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 00d7a268c50b7a941b912057cd702f55, type: 3}
+  m_Script: {fileID: 11500000, guid: ec3e9662451867b45b3742a0f97bdb12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   climbForce: 3
