@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
+
 public class Ooble2 : MonoBehaviour
 {
     public float climbForce = 3;
@@ -26,22 +27,83 @@ public class Ooble2 : MonoBehaviour
 
     private SpriteRenderer _sprite;
 
+    /// <summary>
+    /// //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///                         AUDIO
+    /// //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// </summary>
+    enum SfxType
+    {
+        Death,
+        Birth,
+        Falling,
+        Ooh
+    }
 
-    // Audio
-    string[] _deathSfx = { "Death-1", "Death-2", "Death-3", "Death-4", "Death-5" };
-    string[] _birthSfx = { "Birth-1", "Birth-2", "Birth-3", "Birth-4" };
-    string[] _fallingSfx = { "Falling-1", "Falling-2", "Falling-3" };
-    string[] _oohSfx = { "Ooh!-1", "Ooh!-2", "Ooh!-3" };
+    static string[] _deathSfx = { "Death-1", "Death-2", "Death-3", "Death-4", "Death-5" };
+    static string[] _birthSfx = { "Birth-1", "Birth-2", "Birth-3", "Birth-4" };
+    static string[] _fallingSfx = { "Falling-1", "Falling-2", "Falling-3" };
+    static string[] _oohSfx = { "Ooh!-1", "Ooh!-2", "Ooh!-3" };
+    static string[][] _sfx = { _deathSfx, _birthSfx, _fallingSfx, _oohSfx };
 
-    float _fallingTimeLeft = 0;
-    float _oohTimeLeft = 0;
+    private static List<float> _deathTimes = new List<float>();
+    private static List<float> _birthTimes = new List<float>();
+    private static List<float> _fallingTimes = new List<float>();
+    private static List<float> _oohTimes = new List<float>();
+    static List<float>[] _times = { _deathTimes, _birthTimes, _fallingTimes, _oohTimes };
+    static int[] _sfxMaxCountEachCategory = { 1, 1, 1, 1 };
+
+    private static int soundsPlaying = 0;
+
+    private static string SfxTypeToString(SfxType type)
+    {
+        switch ((int)type)
+        {
+            case (int)SfxType.Death:
+                return "Death";
+            case (int)SfxType.Birth:
+                return "Birth";
+            case (int)SfxType.Falling:
+                return "Falling";
+            case (int)SfxType.Ooh:
+                return "Ooh";
+            default:
+                return "Invalid case";
+        }
+    }
+
+    private static bool PlaySound(SfxType soundType)
+    {
+        if (_times[(int)soundType].Count >= _sfxMaxCountEachCategory[(int)soundType] || soundsPlaying >= 2)
+        {
+            Debug.Log("Chose not to play sound");
+            return false;
+        }
+
+        string[] soundArr = _sfx[(int)soundType];
+        string soundStr = soundArr[UnityEngine.Random.Range(0, soundArr.Length)];
+
+        float timeLength = AudioPlayer.Instance.SoundEffect(soundStr);
+        if (soundType == SfxType.Ooh)
+        {
+            timeLength *= 100;
+        }
+        _times[(int)soundType].Add(timeLength + (int)soundType * 2);
+        soundsPlaying++;
+
+        Debug.Log("Playing " + soundStr + " from " + SfxTypeToString(soundType));
+        return true;
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     void Dead()
     {
         GetComponent<Animator>().SetBool("dead", true);
-        
-        string deathSound = _deathSfx[UnityEngine.Random.Range(0, _deathSfx.Length)];
-        AudioPlayer.Instance.SoundEffect(deathSound);
+        PlaySound(SfxType.Death);
+
         Debug.Log("Ooble Died");
         AudioPlayer.Instance.oobles -= 1;
 
@@ -72,16 +134,32 @@ public class Ooble2 : MonoBehaviour
         speed = UnityEngine.Random.Range(minSpeed, maxSpeed);
         _rb = GetComponent<Rigidbody2D>();
 
-        string birthSound = _deathSfx[UnityEngine.Random.Range(0, _birthSfx.Length)];
-        AudioPlayer.Instance.SoundEffect(birthSound);
+        PlaySound(SfxType.Birth);        
 
         AudioPlayer.Instance.oobles += 1;
         _oobles.Add(this);
        
     }
+    
+
 
     void FixedUpdate()
     {
+        // manage audio timers
+        for (int list = 0; list < _times.Length; list++)
+        {
+            for (int timerIndex = 0; timerIndex < _times[list].Count; timerIndex++)
+            {
+                _times[list][timerIndex] -= Time.fixedDeltaTime;
+                if (_times[list][timerIndex] < 0)
+                {
+                    _times[list].RemoveAt(timerIndex);
+                    soundsPlaying--;
+                    Debug.Log("Sound ended in " + list);
+                }
+            }
+        }
+
         // if (!_climbOoble)
         // {
         //     foreach (var ooble in _oobles)
@@ -109,14 +187,9 @@ public class Ooble2 : MonoBehaviour
             verticalDistance = Mathf.Clamp(verticalDistance, 0, 1);
             float forceMagnitude = Mathf.Min(climbForce / (1 + verticalDistance), maxClimbForce);
             
-            _rb.AddForce(Vector2.up * forceMagnitude, ForceMode2D.Impulse);
+           _rb.AddForce(Vector2.up * forceMagnitude, ForceMode2D.Impulse);
 
-            _oohTimeLeft -= Time.fixedDeltaTime;
-            if (_oohTimeLeft <= 0)
-            {
-                string ooh = _oohSfx[UnityEngine.Random.Range(0, _oohSfx.Length)];
-                _oohTimeLeft = AudioPlayer.Instance.SoundEffect(ooh) * UnityEngine.Random.Range(5, 10);
-            }
+            PlaySound(SfxType.Ooh);     
         }
         
         if (_beingClimedCount > 0)
@@ -144,18 +217,12 @@ public class Ooble2 : MonoBehaviour
                 _rb.velocity = new Vector2(_rb.velocity.x, maxAirbornForce);
         }
 
-        _fallingTimeLeft -= Time.fixedDeltaTime;
-        if (_fallingTimeLeft <= 0)
+    
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 5);
+        if (!hit)
         {
-            RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 5);
-            if (!hit)
-            {
-                string fall = _fallingSfx[UnityEngine.Random.Range(0, _fallingSfx.Length)];
-                _fallingTimeLeft = AudioPlayer.Instance.SoundEffect(fall);
-            }
+            PlaySound(SfxType.Falling);
         }
-        
-
     }
 
     private void OnCollisionStay2D(Collision2D other)

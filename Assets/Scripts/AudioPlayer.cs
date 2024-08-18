@@ -26,11 +26,10 @@ public class AudioPlayer : MonoBehaviour
     private void Update()
     {
         _convoTimeLeft -= Time.deltaTime;
-        if (_convoTimeLeft <= 0)
+        if (false)
         {
             string convo = _convoSfx[UnityEngine.Random.Range(0, _convoSfx.Length)];
             _convoSource.clip = _clips[convo];
-            _convoSource.Play();
             _convoSource.PlayOneShot(_clips[convo]);
             Debug.Log("Playing " + convo);
             _convoTimeLeft = _clips[convo].length;
@@ -42,7 +41,6 @@ public class AudioPlayer : MonoBehaviour
     public float SoundEffect(string effect)
     {
         _audio.PlayOneShot(_clips[effect]);
-        Debug.Log("Playing " + effect);
         return _clips[effect].length;
     }
     
