@@ -19,6 +19,7 @@ public class AudioPlayer : MonoBehaviour
     void Awake()
     {
         _convoSource = convoSource;
+        Instance = this;
         _audio = GetComponent<AudioSource>();
     }
 
@@ -28,16 +29,20 @@ public class AudioPlayer : MonoBehaviour
         if (_convoTimeLeft <= 0)
         {
             string convo = _convoSfx[UnityEngine.Random.Range(0, _convoSfx.Length)];
+            _convoSource.clip = _clips[convo];
+            _convoSource.Play();
             _convoSource.PlayOneShot(_clips[convo]);
+            Debug.Log("Playing " + convo);
             _convoTimeLeft = _clips[convo].length;
         }
 
-        _convoSource.volume = oobles / 50;
+        _convoSource.volume = oobles / 1000;
     }
 
     public float SoundEffect(string effect)
     {
         _audio.PlayOneShot(_clips[effect]);
+        Debug.Log("Playing " + effect);
         return _clips[effect].length;
     }
     
