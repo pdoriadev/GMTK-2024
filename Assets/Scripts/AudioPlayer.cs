@@ -26,21 +26,20 @@ public class AudioPlayer : MonoBehaviour
     private void Update()
     {
         _convoTimeLeft -= Time.deltaTime;
-        if (false)
+        if (_convoTimeLeft < 0)
         {
             string convo = _convoSfx[UnityEngine.Random.Range(0, _convoSfx.Length)];
             _convoSource.clip = _clips[convo];
-            _convoSource.PlayOneShot(_clips[convo]);
-            Debug.Log("Playing " + convo);
-            _convoTimeLeft = _clips[convo].length;
+            _convoSource.PlayOneShot(_clips[convo], UnityEngine.Random.Range(0.01f, 0.02f));
+            Debug.Log("Playing " + convo  + ". Number of oobles: " + oobles);
+            _convoTimeLeft = _clips[convo].length + 20;
         }
 
-        _convoSource.volume = oobles / 1000;
     }
 
     public float SoundEffect(string effect)
     {
-        _audio.PlayOneShot(_clips[effect]);
+        _audio.PlayOneShot(_clips[effect], UnityEngine.Random.Range(0.2f, 0.6f));
         return _clips[effect].length;
     }
     

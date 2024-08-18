@@ -51,6 +51,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ExtraTiles: []
   HoverObject: {fileID: 6446033161552003037, guid: 8ebde8d0944db7e47b2832063e134325, type: 3}
+  mustBeGrounded: 1
 --- !u!61 &6836500593560366206
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -213,7 +214,7 @@ Transform:
   m_GameObject: {fileID: 6866552993645690946}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0.5, y: 0.148, z: 0}
-  m_LocalScale: {x: 1.1990408, y: 0.5995204, z: 1.1990408}
+  m_LocalScale: {x: 1.1990408, y: 0.5995204, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6446033161552003010}

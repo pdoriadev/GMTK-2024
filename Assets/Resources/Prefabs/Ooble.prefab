@@ -158,11 +158,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec3e9662451867b45b3742a0f97bdb12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  climbForce: 3
-  maxClimbForce: 3
+  climbForce: 3.5
+  maxClimbForce: 3.5
   maxAirbornForce: 3
-  minSpeed: 4
-  maxSpeed: 8
+  minSpeed: 3
+  maxSpeed: 6
   minSize: 0.8
   maxSize: 1.2
   _beingClimedCount: 0

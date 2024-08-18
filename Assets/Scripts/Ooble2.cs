@@ -51,7 +51,7 @@ public class Ooble2 : MonoBehaviour
     private static List<float> _fallingTimes = new List<float>();
     private static List<float> _oohTimes = new List<float>();
     static List<float>[] _times = { _deathTimes, _birthTimes, _fallingTimes, _oohTimes };
-    static int[] _sfxMaxCountEachCategory = { 1, 1, 1, 1 };
+    static int[] _sfxMaxCountEachCategory = { 2, 2, 2, 2 };
 
     private static int soundsPlaying = 0;
 

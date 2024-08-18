@@ -8,12 +8,15 @@ public class ItemPlacer : MonoBehaviour
     public static ItemPlacer Instance;
     
     [SerializeField] private Tilemap m_EditableSpaceTilemap = null;
-
+    [SerializeField] private Tilemap m_Default;
+    [SerializeField] private Tilemap m_Wall;
+    
+    
     private Dictionary<Vector3Int, I_ItemDestroyer> m_PlacedItems = new Dictionary<Vector3Int, I_ItemDestroyer>();
     
     private Grid m_Grid;
     private GameObject m_HoverObject;
-    private GameObject m_PlaceObject;
+    private Item m_Item;
 
     public GameObject Platform;
     public GameObject PlatformHover;
@@ -30,28 +33,14 @@ public class ItemPlacer : MonoBehaviour
 
     public void SelectObject(Item item)
     {
-        Debug.Log("Selected!");
-        m_HoverObject = Instantiate(item.HoverObject);
-        m_PlaceObject = item.gameObject;
-        m_PlaceObject.SetActive(false);
-        isMouseDown = true;
-    }
-    
-    public void SelectPlatform()
-    {
-        if (m_HoverObject) 
-            GameObject.Destroy(m_HoverObject);
-        m_HoverObject = Instantiate(PlatformHover);
-        m_PlaceObject = Platform;
-        isMouseDown = true;
-    }
-    
-    public void SelectSpring()
-    {
-        if (m_HoverObject) 
-            GameObject.Destroy(m_HoverObject);
-        m_HoverObject = Instantiate(SpringHover);
-        m_PlaceObject = Spring;
+        if (!m_Item)
+        {
+            Debug.Log("Selected!");
+            m_HoverObject = Instantiate(item.HoverObject);
+            m_Item = item;
+            m_Item.gameObject.SetActive(false);
+            isMouseDown = true;
+        }
     }
     
     void Start()
@@ -70,25 +59,47 @@ public class ItemPlacer : MonoBehaviour
             mouseGridPos = m_Grid.WorldToCell(mouseWorldPos);
         }
 
-        if (!m_EditableSpaceTilemap.HasTile(mouseGridPos))
-        {
-            return;
-        }
-
         if (m_HoverObject)
         {
             m_HoverObject.transform.position = mouseGridPos;
         }
 
-        if (m_PlaceObject && !isMouseDown && Input.GetMouseButtonDown(0))
+        if (!m_EditableSpaceTilemap.HasTile(mouseGridPos))
         {
-            Debug.Log("Placed!");
-            m_PlaceObject.SetActive(true);
-            m_PlaceObject.transform.position = mouseGridPos;
-            if (m_HoverObject)
-                GameObject.Destroy(m_HoverObject);
-            m_PlaceObject = null;
-            m_HoverObject = null;
+            return;
+        }
+        
+        if (m_Item && !isMouseDown && Input.GetMouseButtonDown(0))
+        {
+            bool canPlace = true;
+            foreach (var pos in m_Item.ExtraTiles)
+            {
+                if (!m_EditableSpaceTilemap.HasTile(mouseGridPos + m_Grid.WorldToCell(pos)))
+                {
+                    canPlace = false;
+                }
+            }
+
+            if (m_Item.mustBeGrounded)
+            {
+                if (!(m_Default.HasTile(mouseGridPos + m_Grid.WorldToCell(new Vector3Int(0, -1, 0)))
+                        || m_Wall.HasTile(mouseGridPos + m_Grid.WorldToCell(new Vector3Int(0, -1, 0)))))
+                {
+                    canPlace = false;
+                }
+            }
+
+            if (canPlace)
+            {
+                Debug.Log("Placed!");
+                m_Item.gameObject.SetActive(true);
+                m_Item.transform.position = mouseGridPos;
+                m_Item.Place();
+                if (m_HoverObject)
+                    GameObject.Destroy(m_HoverObject);
+                m_Item = null;
+                m_HoverObject = null;
+            }
         }
 
         if (Input.GetMouseButtonDown(0))
