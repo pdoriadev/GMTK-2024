@@ -32,10 +32,9 @@ public class Ooble2 : MonoBehaviour
     string[] _birthSfx = { "Birth-1", "Birth-2", "Birth-3", "Birth-4" };
     string[] _fallingSfx = { "Falling-1", "Falling-2", "Falling-3" };
     string[] _oohSfx = { "Ooh!-1", "Ooh!-2", "Ooh!-3" };
-    string[] _convoSfx = { "Convo-1", "Convo-2" };
 
-    static float _convoTimeLeft = 0;
     float _fallingTimeLeft = 0;
+    float _oohTimeLeft = 0;
 
     void Dead()
     {
@@ -96,6 +95,13 @@ public class Ooble2 : MonoBehaviour
             float forceMagnitude = Mathf.Min(climbForce / (1 + verticalDistance), maxClimbForce);
             
             _rb.AddForce(Vector2.up * forceMagnitude, ForceMode2D.Impulse);
+
+            _oohTimeLeft -= Time.fixedDeltaTime;
+            if (_oohTimeLeft <= 0)
+            {
+                string ooh = _oohSfx[UnityEngine.Random.Range(0, _oohSfx.Length)];
+                _oohTimeLeft = AudioPlayer.Instance.SoundEffect(ooh) * UnityEngine.Random.Range(5, 10);
+            }
         }
         
         if (_beingClimedCount > 0)
@@ -123,7 +129,17 @@ public class Ooble2 : MonoBehaviour
                 _rb.velocity = new Vector2(_rb.velocity.x, maxAirbornForce);
         }
 
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 5);
+        _fallingTimeLeft -= Time.fixedDeltaTime;
+        if (_fallingTimeLeft <= 0)
+        {
+            RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 5);
+            if (!hit)
+            {
+                string fall = _fallingSfx[UnityEngine.Random.Range(0, _fallingSfx.Length)];
+                _fallingTimeLeft = AudioPlayer.Instance.SoundEffect(fall);
+            }
+        }
+        
 
     }
 
