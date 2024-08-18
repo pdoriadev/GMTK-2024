@@ -26,9 +26,26 @@ public class Ooble2 : MonoBehaviour
 
     private SpriteRenderer _sprite;
 
+
+    // Audio
+    string[] _deathSfx = { "Death-1", "Death-2", "Death-3", "Death-4", "Death-5" };
+    string[] _birthSfx = { "Birth-1", "Birth-2", "Birth-3", "Birth-4" };
+    string[] _fallingSfx = { "Falling-1", "Falling-2", "Falling-3" };
+    string[] _oohSfx = { "Ooh!-1", "Ooh!-2", "Ooh!-3" };
+    string[] _convoSfx = { "Convo-1", "Convo-2" };
+
+    static float _convoTimeLeft = 0;
+    float _fallingTimeLeft = 0;
+
     void Dead()
     {
         GetComponent<Animator>().SetBool("dead", true);
+        
+        string deathSound = _deathSfx[UnityEngine.Random.Range(0, _deathSfx.Length)];
+        AudioPlayer.Instance.SoundEffect(deathSound);
+        AudioPlayer.Instance.oobles -= 1;
+
+        _oobles.Remove(this);
     }
     
     void Start()
@@ -40,7 +57,13 @@ public class Ooble2 : MonoBehaviour
         //_isMovingRight = UnityEngine.Random.value > 0.5f;
         speed = UnityEngine.Random.Range(minSpeed, maxSpeed);
         _rb = GetComponent<Rigidbody2D>();
+
+        string birthSound = _deathSfx[UnityEngine.Random.Range(0, _birthSfx.Length)];
+        AudioPlayer.Instance.SoundEffect(birthSound);
+
+        AudioPlayer.Instance.oobles += 1;
         _oobles.Add(this);
+       
     }
 
     void FixedUpdate()
@@ -99,6 +122,9 @@ public class Ooble2 : MonoBehaviour
             if (_rb.velocity.y > maxAirbornForce)
                 _rb.velocity = new Vector2(_rb.velocity.x, maxAirbornForce);
         }
+
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 5);
+
     }
 
     private void OnCollisionStay2D(Collision2D other)

@@ -10,6 +10,8 @@ public class Goal : MonoBehaviour
     public float width = 2.0f;
     public float height = 5.0f;
 
+    public int count = 0;
+
     void Start()
     {
         
@@ -23,7 +25,7 @@ public class Goal : MonoBehaviour
         ContactFilter2D filter2D = new ContactFilter2D();
         filter2D.SetLayerMask(LayerMask.GetMask("Ooble"));
         List<Collider2D> results = new List<Collider2D>();
-        var count = Physics2D.OverlapArea(bottomLeft, topRight, filter2D, results);
+        count = Physics2D.OverlapArea(bottomLeft, topRight, filter2D, results);
         text.text = Mathf.Clamp(goal - count, 0, goal).ToString();
     }
 }
