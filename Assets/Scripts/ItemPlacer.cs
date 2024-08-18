@@ -5,6 +5,8 @@ using UnityEngine.Tilemaps;
 
 public class ItemPlacer : MonoBehaviour
 {
+    public static ItemPlacer Instance;
+    
     [SerializeField] private Tilemap m_EditableSpaceTilemap = null;
 
     private Dictionary<Vector3Int, I_ItemDestroyer> m_PlacedItems = new Dictionary<Vector3Int, I_ItemDestroyer>();
@@ -18,12 +20,30 @@ public class ItemPlacer : MonoBehaviour
     public GameObject Spring;
     public GameObject SpringHover;
 
+    private bool isMouseDown = false;
+    
+    void Awake()
+    {
+        if (Instance == null)
+            Instance = this;
+    }
+
+    public void SelectObject(Item item)
+    {
+        Debug.Log("Selected!");
+        m_HoverObject = Instantiate(item.HoverObject);
+        m_PlaceObject = item.gameObject;
+        m_PlaceObject.SetActive(false);
+        isMouseDown = true;
+    }
+    
     public void SelectPlatform()
     {
         if (m_HoverObject) 
             GameObject.Destroy(m_HoverObject);
         m_HoverObject = Instantiate(PlatformHover);
         m_PlaceObject = Platform;
+        isMouseDown = true;
     }
     
     public void SelectSpring()
@@ -59,38 +79,19 @@ public class ItemPlacer : MonoBehaviour
         {
             m_HoverObject.transform.position = mouseGridPos;
         }
-        
-        // Attempt to Add Item
-        if (Input.GetMouseButtonDown(0))
-        {
-            if (m_PlaceObject)
-            {
-                var instance = Instantiate(m_PlaceObject);
-                instance.transform.position = mouseGridPos;
-                GameObject.Destroy(m_HoverObject);
-                m_HoverObject = null;
-                m_PlaceObject = null;
-            }
 
-            // if (m_PlacedItems.ContainsKey(mouseGridPos))
-            // {
-            //     Debug.Log("An item is already placed here.");
-            //     return;
-            // }
-            return;
+        if (m_PlaceObject && !isMouseDown && Input.GetMouseButtonDown(0))
+        {
+            Debug.Log("Placed!");
+            m_PlaceObject.SetActive(true);
+            m_PlaceObject.transform.position = mouseGridPos;
+            if (m_HoverObject)
+                GameObject.Destroy(m_HoverObject);
+            m_PlaceObject = null;
+            m_HoverObject = null;
         }
 
-        // Remove Item
-        // if (Input.GetMouseButtonDown(1))
-        // {
-        //     I_ItemDestroyer destroyer = m_PlacedItems[mouseGridPos];
-        //     if (destroyer == null)
-        //     {
-        //         return;
-        //     }
-        //
-        //     m_PlacedItems.Remove(mouseGridPos);
-        //     destroyer.DestroyItem();
-        // }
+        if (Input.GetMouseButtonDown(0))
+            isMouseDown = false;
     }
 }
