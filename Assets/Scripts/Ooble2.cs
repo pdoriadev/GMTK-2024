@@ -26,11 +26,41 @@ public class Ooble2 : MonoBehaviour
 
     private SpriteRenderer _sprite;
 
+
+    // Audio
+    string[] _deathSfx = { "Death-1", "Death-2", "Death-3", "Death-4", "Death-5" };
+    string[] _birthSfx = { "Birth-1", "Birth-2", "Birth-3", "Birth-4" };
+    string[] _fallingSfx = { "Falling-1", "Falling-2", "Falling-3" };
+    string[] _oohSfx = { "Ooh!-1", "Ooh!-2", "Ooh!-3" };
+
+    float _fallingTimeLeft = 0;
+    float _oohTimeLeft = 0;
+
     void Dead()
     {
         GetComponent<Animator>().SetBool("dead", true);
+        
+        string deathSound = _deathSfx[UnityEngine.Random.Range(0, _deathSfx.Length)];
+        AudioPlayer.Instance.SoundEffect(deathSound);
+        AudioPlayer.Instance.oobles -= 1;
+
+        _oobles.Remove(this);
     }
-    
+
+    public void Jump(float strength)
+    {
+        _isJumping = true;
+        _rb.AddForce(Vector2.up * strength, ForceMode2D.Impulse);
+        StartCoroutine(JumpRoutine());
+    }
+
+    private bool _isJumping;
+    IEnumerator JumpRoutine()
+    {
+        yield return new WaitForSeconds(0.5f);
+        _isJumping = false;
+    }
+
     void Start()
     {
         var size = UnityEngine.Random.Range(minSize, maxSize);
@@ -40,7 +70,13 @@ public class Ooble2 : MonoBehaviour
         //_isMovingRight = UnityEngine.Random.value > 0.5f;
         speed = UnityEngine.Random.Range(minSpeed, maxSpeed);
         _rb = GetComponent<Rigidbody2D>();
+
+        string birthSound = _deathSfx[UnityEngine.Random.Range(0, _birthSfx.Length)];
+        AudioPlayer.Instance.SoundEffect(birthSound);
+
+        AudioPlayer.Instance.oobles += 1;
         _oobles.Add(this);
+       
     }
 
     void FixedUpdate()
@@ -73,6 +109,13 @@ public class Ooble2 : MonoBehaviour
             float forceMagnitude = Mathf.Min(climbForce / (1 + verticalDistance), maxClimbForce);
             
             _rb.AddForce(Vector2.up * forceMagnitude, ForceMode2D.Impulse);
+
+            _oohTimeLeft -= Time.fixedDeltaTime;
+            if (_oohTimeLeft <= 0)
+            {
+                string ooh = _oohSfx[UnityEngine.Random.Range(0, _oohSfx.Length)];
+                _oohTimeLeft = AudioPlayer.Instance.SoundEffect(ooh) * UnityEngine.Random.Range(5, 10);
+            }
         }
         
         if (_beingClimedCount > 0)
@@ -96,9 +139,22 @@ public class Ooble2 : MonoBehaviour
                 _sprite.flipX = true;
             }
 
-            if (_rb.velocity.y > maxAirbornForce)
+            if (!_isJumping && _rb.velocity.y > maxAirbornForce)
                 _rb.velocity = new Vector2(_rb.velocity.x, maxAirbornForce);
         }
+
+        _fallingTimeLeft -= Time.fixedDeltaTime;
+        if (_fallingTimeLeft <= 0)
+        {
+            RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 5);
+            if (!hit)
+            {
+                string fall = _fallingSfx[UnityEngine.Random.Range(0, _fallingSfx.Length)];
+                _fallingTimeLeft = AudioPlayer.Instance.SoundEffect(fall);
+            }
+        }
+        
+
     }
 
     private void OnCollisionStay2D(Collision2D other)
@@ -121,14 +177,14 @@ public class Ooble2 : MonoBehaviour
             }
         }
         
-        if (other.transform.CompareTag("Wall"))
-        {
-            if (transform.position.x < other.transform.position.x)
-                _isMovingRight = false;
-            else
-                _isMovingRight = true;
-            Dead();
-        }
+        //if (other.transform.CompareTag("Wall"))
+        //{
+        //    if (transform.position.x < other.transform.position.x)
+        //        _isMovingRight = false;
+        //    else
+        //        _isMovingRight = true;
+        //    Dead();
+        //}
     }
 
     private void OnCollisionExit2D(Collision2D other)
@@ -165,7 +221,16 @@ public class Ooble2 : MonoBehaviour
         
         if (other.transform.CompareTag("Wall"))
         {
-            _isMovingRight = !_isMovingRight;
+            ContactFilter2D filter2D = new ContactFilter2D();
+            filter2D.SetLayerMask(LayerMask.GetMask("Wall"));
+            List<ContactPoint2D> contacts = new List<ContactPoint2D>();
+            if (_rb.GetContacts(filter2D, contacts) > 0)
+            {
+                if (contacts[0].point.y > transform.position.y - 0.2f)
+                {
+                    _isMovingRight = !_isMovingRight;
+                }
+            }
         }
     }
 }
