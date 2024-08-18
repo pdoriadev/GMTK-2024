@@ -42,6 +42,7 @@ public class Ooble2 : MonoBehaviour
         
         string deathSound = _deathSfx[UnityEngine.Random.Range(0, _deathSfx.Length)];
         AudioPlayer.Instance.SoundEffect(deathSound);
+        Debug.Log("Ooble Died");
         AudioPlayer.Instance.oobles -= 1;
 
         _oobles.Remove(this);
