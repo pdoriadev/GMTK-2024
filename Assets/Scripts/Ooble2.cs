@@ -30,6 +30,20 @@ public class Ooble2 : MonoBehaviour
     {
         GetComponent<Animator>().SetBool("dead", true);
     }
+
+    public void Jump(float strength)
+    {
+        _isJumping = true;
+        _rb.AddForce(Vector2.up * strength, ForceMode2D.Impulse);
+        StartCoroutine(JumpRoutine());
+    }
+
+    private bool _isJumping;
+    IEnumerator JumpRoutine()
+    {
+        yield return new WaitForSeconds(0.5f);
+        _isJumping = false;
+    }
     
     void Start()
     {
@@ -96,7 +110,7 @@ public class Ooble2 : MonoBehaviour
                 _sprite.flipX = true;
             }
 
-            if (_rb.velocity.y > maxAirbornForce)
+            if (!_isJumping && _rb.velocity.y > maxAirbornForce)
                 _rb.velocity = new Vector2(_rb.velocity.x, maxAirbornForce);
         }
     }
@@ -121,16 +135,16 @@ public class Ooble2 : MonoBehaviour
             }
         }
         
-        if (other.transform.CompareTag("Wall"))
-        {
-            if (transform.position.x < other.transform.position.x)
-                _isMovingRight = false;
-            else
-                _isMovingRight = true;
-            Dead();
-        }
+        // if (other.transform.CompareTag("Wall"))
+        // {
+        //     if (transform.position.x < other.transform.position.x)
+        //         _isMovingRight = false;
+        //     else
+        //         _isMovingRight = true;
+        //     //Dead();
+        // }
     }
-
+    
     private void OnCollisionExit2D(Collision2D other)
     {
         if (other.transform.CompareTag("Ooble"))
@@ -146,26 +160,18 @@ public class Ooble2 : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D other)
     {
-        // if (_beingClimedCount > 0)
-        //     return;
-        
-        // if (other.transform.CompareTag("Ooble"))
-        // {
-        //     if (transform.position.y >= other.transform.position.y)
-        //     {
-        //         if ((_isMovingRight && transform.position.x < other.transform.position.x) ||
-        //             (!_isMovingRight && transform.position.x > other.transform.position.x))
-        //         {
-        //             var ooble = other.transform.GetComponent<Ooble2>();
-        //             ooble._beingClimedCount++;
-        //             _climbOoble = ooble;
-        //         }
-        //     }
-        // }
-        
         if (other.transform.CompareTag("Wall"))
         {
-            _isMovingRight = !_isMovingRight;
+            ContactFilter2D filter2D = new ContactFilter2D();
+            filter2D.SetLayerMask(LayerMask.GetMask("Wall"));
+            List<ContactPoint2D> contacts = new List<ContactPoint2D>();
+            if(_rb.GetContacts(filter2D, contacts) > 0)
+            {
+                if (contacts[0].point.y > transform.position.y - 0.2f)
+                {
+                    _isMovingRight = !_isMovingRight;
+                }
+            }
         }
     }
 }

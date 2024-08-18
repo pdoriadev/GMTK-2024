@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 7189485102730087409}
   - component: {fileID: 8111702568351002860}
   - component: {fileID: 4787115573637637130}
+  - component: {fileID: 883292035906721342}
   m_Layer: 6
   m_Name: Ooble
   m_TagString: Ooble
@@ -158,12 +159,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec3e9662451867b45b3742a0f97bdb12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  climbForce: 3
-  maxClimbForce: 3
-  maxAirbornForce: 3
-  minSpeed: 4
-  maxSpeed: 8
+  climbForce: 3.5
+  maxClimbForce: 3.5
+  maxAirbornForce: 2.5
+  minSpeed: 3
+  maxSpeed: 6
   minSize: 0.8
   maxSize: 1.2
   _beingClimedCount: 0
   _climbOoble: {fileID: 0}
+--- !u!66 &883292035906721342
+CompositeCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7189485102730087410}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_GeometryType: 0
+  m_GenerationType: 0
+  m_EdgeRadius: 0
+  m_ColliderPaths: []
+  m_CompositePaths:
+    m_Paths: []
+  m_VertexDistance: 0.0005
+  m_OffsetDistance: 0.00005
